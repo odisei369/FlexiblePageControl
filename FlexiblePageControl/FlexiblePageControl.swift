@@ -156,18 +156,20 @@ public class FlexiblePageControl: UIView {
     }
 
     private func update(currentPage: Int, config: Config) {
+		
+		let itemConfig = ItemView.ItemConfig(dotSize: config.dotSize, smallDotSizeRatio: config.smallDotSizeRatio, mediumDotSizeRatio: config.mediumDotSizeRatio)
 
         if currentPage < displayCount {
 
             items = (-2..<(displayCount + 2))
-                .map { ItemView(itemSize: itemSize, dotSize: config.dotSize, index: $0) }
+                .map { ItemView(itemSize: itemSize, config: itemConfig, index: $0) }
         }
         else {
 
             guard let firstItem = items.first else { return }
             guard let lastItem = items.last else { return }
             items = (firstItem.index...lastItem.index)
-                .map { ItemView(itemSize: itemSize, dotSize: config.dotSize, index: $0) }
+                .map { ItemView(itemSize: itemSize, config: itemConfig, index: $0) }
 //            items = ((currentPage - displayCount - 2)...(currentPage + 2))
 //                .map { ItemView(itemSize: itemSize, dotSize: config.dotSize, index: $0) }
         }
@@ -316,6 +318,12 @@ public class FlexiblePageControl: UIView {
 
 
 private class ItemView: UIView {
+	
+	struct ItemConfig {
+		public var dotSize: CGFloat
+		public var smallDotSizeRatio: CGFloat
+		public var mediumDotSizeRatio: CGFloat
+	}
 
     enum State {
         case None
@@ -323,10 +331,6 @@ private class ItemView: UIView {
         case Medium
         case Normal
     }
-
-    static var mediumSizeRatio: CGFloat = 0.7
-
-    static var smallSizeRatio: CGFloat = 0.5
 
     var index: Int
 
@@ -344,10 +348,10 @@ private class ItemView: UIView {
 
     var animateDuration: TimeInterval = 0.3
 
-    init(itemSize: CGFloat, dotSize: CGFloat, index: Int) {
+    init(itemSize: CGFloat, config: ItemConfig, index: Int) {
         
         self.itemSize = itemSize
-        self.dotSize = dotSize
+        self.config = config
         self.index = index
         
         let x = itemSize * CGFloat(index)
@@ -357,10 +361,10 @@ private class ItemView: UIView {
         
         backgroundColor = UIColor.clear
         
-        dotView.frame.size = CGSize(width: dotSize, height: dotSize)
+        dotView.frame.size = CGSize(width: config.dotSize, height: config.dotSize)
         dotView.center = CGPoint(x: itemSize/2, y: itemSize/2)
         dotView.backgroundColor = dotColor
-        dotView.layer.cornerRadius = dotSize/2
+        dotView.layer.cornerRadius = config.dotSize/2
         dotView.layer.masksToBounds = true
         
         addSubview(dotView)
@@ -377,7 +381,7 @@ private class ItemView: UIView {
 
     private let itemSize: CGFloat
 
-    private let dotSize: CGFloat
+    private let config: ItemConfig
     
     private func updateDotSize(state: State) {
         
@@ -385,13 +389,13 @@ private class ItemView: UIView {
         
         switch state {
         case .Normal:
-            _size = CGSize(width: dotSize, height: dotSize)
+            _size = CGSize(width: config.dotSize, height: config.dotSize)
         case .Medium:
-            _size = CGSize(width: dotSize * ItemView.mediumSizeRatio, height: dotSize * ItemView.mediumSizeRatio)
+            _size = CGSize(width: config.dotSize * config.mediumDotSizeRatio, height: config.dotSize * config.mediumDotSizeRatio)
         case .Small:
             _size = CGSize(
-                width: dotSize * ItemView.smallSizeRatio,
-                height: dotSize * ItemView.smallSizeRatio
+                width: config.dotSize * config.smallDotSizeRatio,
+                height: config.dotSize * config.smallDotSizeRatio
             )
         case .None:
             _size = CGSize.zero
