@@ -195,11 +195,8 @@ public class FlexiblePageControl: UIView {
     private func updateDot(at currentPage: Int, animated: Bool) {
 
         updateDotColor(currentPage: currentPage)
-
-        if numberOfPages > displayCount {
-            updateDotPosition(currentPage: currentPage, animated: animated)
-            updateDotSize(currentPage: currentPage, animated: animated)
-        }
+        updateDotPosition(currentPage: currentPage, animated: animated)
+        updateDotSize(currentPage: currentPage, animated: animated)
     }
     
     private func updateDotColor(currentPage: Int) {
@@ -214,15 +211,7 @@ public class FlexiblePageControl: UIView {
 
         let duration = animated ? animateDuration : 0
 
-        if currentPage == 0 {
-            let x = -scrollView.contentInset.left
-            moveScrollViewView(x: x, duration: duration)
-        }
-        else if currentPage == numberOfPages - 1 {
-            let x = scrollView.contentSize.width - scrollView.bounds.width + scrollView.contentInset.right
-            moveScrollViewView(x: x, duration: duration)
-        }
-        else if CGFloat(currentPage) * itemSize <= scrollView.contentOffset.x + itemSize {
+        if CGFloat(currentPage) * itemSize <= scrollView.contentOffset.x + itemSize {
             let x = scrollView.contentOffset.x - itemSize
             moveScrollViewView(x: x, duration: duration)
         }
@@ -251,23 +240,23 @@ public class FlexiblePageControl: UIView {
                 item.state = .None
             }
             // first dot from left
-            else if item.frame.minX <= scrollView.contentOffset.x {
-                item.state = .Small
+            else if item.index == currentPage - 1 {
+                item.state = .Medium
             }
             // first dot from right
-            else if item.frame.maxX >= scrollView.contentOffset.x + scrollView.bounds.width {
-                item.state = .Small
+            else if item.index == currentPage + 1 {
+                item.state = .Medium
             }
             // second dot from left
-            else if item.frame.minX <= scrollView.contentOffset.x + itemSize {
-                item.state = .Medium
+            else if item.index == currentPage - 2 {
+                item.state = .Small
             }
             // second dot from right
-            else if item.frame.maxX >= scrollView.contentOffset.x + scrollView.bounds.width - itemSize {
-                item.state = .Medium
+            else if item.index == currentPage + 2 {
+                item.state = .Small
             }
             else {
-                item.state = .Normal
+                item.state = .None
             }
         }
     }
