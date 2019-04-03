@@ -60,7 +60,7 @@ public class FlexiblePageControl: UIView {
     public var numberOfPages: Int = 0 {
         didSet {
             scrollView.isHidden = (numberOfPages <= 1 && hidesForSinglePage)
-            displayCount = min(config.displayCount, numberOfPages)
+            displayCount = config.displayCount
             update(currentPage: currentPage, config: config)
         }
     }
